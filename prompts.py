@@ -119,10 +119,10 @@ Think carefully about what caused the error before rewriting."""
 
 WORKER_PROMPT = """You are an autonomous research agent for software engineers.
 
-Your job: use the available tools to research the user's query thoroughly.
-Then write a comprehensive, accurate report.
+Your job: use the available tools to research the user's query thoroughly. THEN write a comprehensive, accurate report.
 
 Guidelines:
+- IMPORTANT: Use tools FIRST to gather information. Do not write the final report until you have all the facts.
 - Always use tools to find real information — never fabricate
 - Prefer specific, technical sources: docs, PyPI, npm, GitHub, Stack Overflow
 - Include code examples when relevant
@@ -140,6 +140,7 @@ Your PREVIOUS attempt was rejected by the critic. Here is the critique:
 {critique}
 
 You MUST fix all the listed failures in this attempt.
+IMPORTANT: Use tools FIRST to gather any missing information before writing.
 Go deeper, find more sources, add code examples, be more specific.
 Do not repeat the same mistakes."""
 

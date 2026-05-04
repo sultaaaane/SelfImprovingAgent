@@ -243,6 +243,9 @@ def worker_node(state: AgentState) -> AgentState:
 
     critique = state.get("critique", {})
     iteration = state.get("iteration", 0)
+    plan = state.get("plan", {})
+    reqs = plan.get("requirements", [])
+    req_text = "\n".join(f"- {r}" for r in reqs)
 
     if critique and iteration > 0:
         instructions = critique.get("instructions", "")
@@ -250,12 +253,22 @@ def worker_node(state: AgentState) -> AgentState:
         system_content = WORKER_WITH_CRITIQUE_PROMPT.format(
             critique=f"Failures:\n{failures}\n\nInstructions: {instructions}"
         )
+        if req_text:
+            system_content += f"\n\nOriginal Requirements Checklist:\n{req_text}"
     else:
         system_content = WORKER_PROMPT
+        if req_text:
+            system_content += f"\n\nRequirements Checklist:\n{req_text}"
 
+    # To ensure it knows about tools and history, we don't clear messages.
     messages = [SystemMessage(content=system_content)] + state["messages"]
     response = llm_with_tools.invoke(messages)
-    return {"messages": [response], "draft": response.content}
+
+    update = {"messages": [response]}
+    if response.content.strip():
+        update["draft"] = response.content
+
+    return update
 
 
 def tools_node_wrapper(state: AgentState) -> AgentState:
@@ -310,11 +323,25 @@ def critic_node(state: AgentState) -> AgentState:
         f"[critic] score={critique.get('overall'):.1f} passed={approved} iter={iteration}"
     )
 
-    return {
+    update = {
         "critique": critique,
         "approved": approved,
         "iteration": iteration + 1,
     }
+
+    if not approved:
+        # Instead of just changing SystemMessage later, we also send the critique as a HumanMessage
+        # so the model has it natively at the end of the history.
+        instructions = critique.get("instructions", "")
+        failures = "\n".join(f"- {f}" for f in critique.get("failures", []))
+        feedback = (
+            f"CRITIQUE Feedback on your previous draft:\n"
+            f"Failures:\n{failures}\n\nInstructions:\n{instructions}\n\n"
+            f"Please try again and generate the final report (or use tools if you still lack info)."
+        )
+        update["messages"] = [HumanMessage(content=feedback)]
+
+    return update
 
 
 def critic_decision(state: AgentState) -> Literal["synthesizer", "worker", "fail"]:
