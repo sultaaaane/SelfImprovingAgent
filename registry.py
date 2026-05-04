@@ -18,9 +18,22 @@ MANIFEST_PATH = Path("tool_manifest.json")
 
 # Packages the tool writer is allowed to import
 ALLOWED_IMPORTS = {
-    "requests", "bs4", "beautifulsoup4", "json", "re", "os",
-    "subprocess", "urllib", "http", "collections", "itertools",
-    "datetime", "pathlib", "typing", "ddgs", "duckduckgo_search",
+    "requests",
+    "bs4",
+    "beautifulsoup4",
+    "json",
+    "re",
+    "os",
+    "subprocess",
+    "urllib",
+    "http",
+    "collections",
+    "itertools",
+    "datetime",
+    "pathlib",
+    "typing",
+    "ddgs",
+    "duckduckgo_search",
     "langchain_core",
 }
 
@@ -36,6 +49,7 @@ class ToolRegistry:
     def _load_base_tools(self):
         try:
             from tools import search_web, read_page
+
             self.register(search_web)
             self.register(read_page)
             logger.info("Base tools loaded: search_web, read_page")
@@ -73,7 +87,11 @@ class ToolRegistry:
                     continue
                 attr = getattr(module, attr_name)
                 # LangChain tools expose .name and .invoke
-                if callable(attr) and hasattr(attr, "name") and hasattr(attr, "invoke"):
+                if (
+                    hasattr(attr, "name")
+                    and hasattr(attr, "invoke")
+                    and callable(getattr(attr, "invoke", None))
+                ):
                     self.register(attr)
                     loaded.append(attr.name)
 
@@ -117,6 +135,7 @@ class ToolRegistry:
     def validate_imports(code: str) -> tuple[bool, str]:
         """Reject code that imports disallowed packages."""
         import ast
+
         try:
             tree = ast.parse(code)
         except SyntaxError as e:

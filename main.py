@@ -19,12 +19,16 @@ console = Console()
 
 
 def get_session() -> str:
-    console.print(Panel(
-        "[bold cyan]Self-Evolving Developer Agent[/bold cyan]\n"
-        "[dim]Writes its own tools. Gets smarter every session.[/dim]",
-        border_style="cyan"
-    ))
-    session = console.input("\n[bold]Session name[/bold] (Enter for 'default'): ").strip()
+    console.print(
+        Panel(
+            "[bold cyan]Self-Evolving Developer Agent[/bold cyan]\n"
+            "[dim]Writes its own tools. Gets smarter every session.[/dim]",
+            border_style="cyan",
+        )
+    )
+    session = console.input(
+        "\n[bold]Session name[/bold] (Enter for 'default'): "
+    ).strip()
     return session or "default"
 
 
@@ -52,7 +56,9 @@ def print_node_event(node_name: str, output: dict):
         error = output.get("tool_test_error", "")
         remaining = output.get("missing_tools", [])
         if passed:
-            console.print(f"✅ [green]Tool test passed[/green] — {len(remaining)} tools remaining")
+            console.print(
+                f"✅ [green]Tool test passed[/green] — {len(remaining)} tools remaining"
+            )
         else:
             console.print(f"❌ [red]Tool test failed[/red]: {error[:120]}")
 
@@ -91,7 +97,9 @@ def print_node_event(node_name: str, output: dict):
         console.print("✍️  [bold]Synthesizer[/bold] formatting final report...")
 
     elif node_name == "fail":
-        console.print("⚠️  [yellow]Max attempts reached — returning best draft[/yellow]")
+        console.print(
+            "⚠️  [yellow]Max attempts reached — returning best draft[/yellow]"
+        )
 
     elif node_name == "recall":
         console.print("💾 [bold]Recall[/bold] — answering from memory")
@@ -104,7 +112,9 @@ def main():
     thread_id = get_session()
     config = {"configurable": {"thread_id": thread_id}}
 
-    console.print(f"\n[dim]Session: {thread_id} | Model: {os.getenv('MODEL', 'qwen2.5-coder:7b')}[/dim]")
+    console.print(
+        f"\n[dim]Session: {thread_id} | Model: {os.getenv('MODEL', 'qwen2.5-coder:7b')}[/dim]"
+    )
     console.print(Rule(style="dim"))
 
     while True:
@@ -122,7 +132,12 @@ def main():
 
         if query.lower() == "/tools":
             from registry import registry
-            console.print(Panel(registry.describe(), title="Live Tool Registry", border_style="cyan"))
+
+            console.print(
+                Panel(
+                    registry.describe(), title="Live Tool Registry", border_style="cyan"
+                )
+            )
             continue
 
         console.print(Rule(style="dim"))
@@ -143,7 +158,12 @@ def main():
             console.print(Rule(style="dim"))
             console.print("\n[bold]FINAL REPORT[/bold]")
             console.print(Markdown(final_output))
-        
+
+            report_path = f"report_{thread_id}.md"
+            with open(report_path, "w", encoding="utf-8") as f:
+                f.write(final_output)
+            console.print(f"\n[green]Report saved to {report_path}[/green]")
+
         console.print(Rule(style="dim"))
 
 

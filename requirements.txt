@@ -7,3 +7,4 @@ beautifulsoup4
 duckduckgo-search
 python-dotenv
 rich
+langgraph-checkpoint-sqlite
