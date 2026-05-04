@@ -1,0 +1,4 @@
+{
+  "search_web": "Search the web for a query. Returns titles, URLs, and snippets.",
+  "read_page": "Fetch and extract the main text content from a webpage URL."
+}

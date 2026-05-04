@@ -1,0 +1,9 @@
+langchain-ollama
+langchain-core
+langgraph
+langchain-community
+requests
+beautifulsoup4
+duckduckgo-search
+python-dotenv
+rich
