@@ -2,9 +2,9 @@
   "search_web": "Search the web for a query. Returns titles, URLs, and snippets.",
   "read_page": "Fetch and extract the main text content from a webpage URL.",
   "fetch_pypi_info": "Fetch PyPI metadata for a Python package: latest version, summary, homepage, license.",
-  "search_cve": "Search for details about a Common Vulnerabilities and Exposures (CVE) ID.",
+  "run_python_snippet": "Run a Python code snippet and return the output.",
   "search_github_issues": "Search GitHub issues for a specific query. Returns titles, URLs, and brief descriptions of the issues.",
   "fetch_github_readme": "Fetch the README content from a GitHub repository URL.",
-  "run_python_snippet": "Run a Python code snippet and return the output.",
+  "search_cve": "Search for details about a Common Vulnerabilities and Exposures (CVE) ID.",
   "check_package_version": "Check the latest version of a Python package on PyPI."
 }
